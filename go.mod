@@ -1,4 +1,4 @@
-module Auth
+module github.com/artemSorokin1/Auth-proto
 
 go 1.22
 
