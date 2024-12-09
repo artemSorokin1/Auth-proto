@@ -1,40 +1,38 @@
 syntax = "proto3";
 
-package auth;
+package api;
 
-option go_package = "artem.auth.v1;authv1";
+option go_package = "pkg/api";
 
-message RegisterRequest {
-  string username = 1;
-  string password = 2;
-  string email = 3;
-}
-
-message RegisterResponse {
-  uint64 user_id = 1;
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  rpc IsAdmin(IsAdminRequest) returns (IsAdminResponse) {}
 }
 
 message LoginRequest {
   string username = 1;
   string password = 2;
-  int32 app_id = 3;
 }
 
 message LoginResponse {
   string token = 1;
 }
 
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+}
+
 message IsAdminRequest {
-  uint64 user_id = 1;
+  int64 user_id = 1;
 }
 
 message IsAdminResponse {
- bool is_admin = 1;
+  bool is_admin = 1;
 }
-
-service AuthService {
-  rpc Register(RegisterRequest) returns (RegisterResponse);
-  rpc Login(LoginRequest) returns (LoginResponse);
-  rpc IsAdmin(IsAdminRequest) returns (IsAdminResponse);
-}
-
