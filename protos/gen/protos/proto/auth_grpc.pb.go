@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.27.1
-// source: protos/proto/auth.proto
+// source: auth.proto
 
 package api
 
@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Login_FullMethodName    = "/api.AuthService/Login"
-	AuthService_Register_FullMethodName = "/api.AuthService/Register"
-	AuthService_IsAdmin_FullMethodName  = "/api.AuthService/IsAdmin"
+	AuthService_Login_FullMethodName         = "/api.AuthService/Login"
+	AuthService_Register_FullMethodName      = "/api.AuthService/Register"
+	AuthService_IsAdmin_FullMethodName       = "/api.AuthService/IsAdmin"
+	AuthService_RefreshTokens_FullMethodName = "/api.AuthService/RefreshTokens"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -31,6 +32,7 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error)
+	RefreshTokens(ctx context.Context, in *RefreshTokensRequest, opts ...grpc.CallOption) (*RefreshTokensResponse, error)
 }
 
 type authServiceClient struct {
@@ -71,6 +73,16 @@ func (c *authServiceClient) IsAdmin(ctx context.Context, in *IsAdminRequest, opt
 	return out, nil
 }
 
+func (c *authServiceClient) RefreshTokens(ctx context.Context, in *RefreshTokensRequest, opts ...grpc.CallOption) (*RefreshTokensResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshTokensResponse)
+	err := c.cc.Invoke(ctx, AuthService_RefreshTokens_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error)
+	RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest
 }
 func (UnimplementedAuthServiceServer) IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsAdmin not implemented")
+}
+func (UnimplementedAuthServiceServer) RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshTokens not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -172,6 +188,24 @@ func _AuthService_IsAdmin_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_RefreshTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshTokensRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RefreshTokens(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RefreshTokens_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RefreshTokens(ctx, req.(*RefreshTokensRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,7 +225,11 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "IsAdmin",
 			Handler:    _AuthService_IsAdmin_Handler,
 		},
+		{
+			MethodName: "RefreshTokens",
+			Handler:    _AuthService_RefreshTokens_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protos/proto/auth.proto",
+	Metadata: "auth.proto",
 }
