@@ -9,6 +9,15 @@ service AuthService {
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   rpc IsAdmin(IsAdminRequest) returns (IsAdminResponse) {}
   rpc RefreshTokens(RefreshTokensRequest) returns (RefreshTokensResponse) {}
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+}
+
+message LogoutRequest {
+  int64 user_id = 1;
+}
+
+message LogoutResponse {
+  bool isSuccess = 1;
 }
 
 message RefreshTokensRequest {
